@@ -15,7 +15,7 @@ import (
 )
 
 type Todo struct {
-	ID        primitive.ObjectID `json:"id,omitempty" bson:"_id,omitempty"`
+	ID        primitive.ObjectID `json:"_id,omitempty" bson:"_id,omitempty"`
 	Completed bool               `json:"completed"`
 	Body      string             `json:"body" bson:"body"`
 }
@@ -23,11 +23,14 @@ type Todo struct {
 var collection *mongo.Collection
 
 func main() {
-	fmt.Println("tests")
+	fmt.Println("starting")
 
-	err := godotenv.Load(".env")
-	if err != nil {
-		log.Fatal("error loading the .env", err)
+	if os.Getenv("ENV") != "production" {
+		// load .env file just if isnt in production
+		err := godotenv.Load(".env")
+		if err != nil {
+			log.Fatal("error loading the .env", err)
+		}
 	}
 
 	MONGODB_URI := os.Getenv("MONGODB_URI")
@@ -51,6 +54,12 @@ func main() {
 
 	app := fiber.New()
 
+	// uncomment if you want to use in local
+	//	app.Use(cors.New(cors.Config{
+	//		AllowOrigins: "http://localhost:5173",
+	//		AllowHeaders: "Origin,Content-Type,Accept",
+	//	}))
+
 	app.Get("/api/todos", getTodos)
 	app.Post("/api/todos", postTodo)
 	app.Patch("/api/todos/:id", patchTodo)
@@ -59,6 +68,11 @@ func main() {
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "5000"
+	}
+
+	// serve static files in production
+	if os.Getenv("ENV") == "production" {
+		app.Static("/", "./client/dist")
 	}
 
 	log.Fatal(app.Listen("0.0.0.0:" + port))
@@ -135,7 +149,6 @@ func deleteTodo(c *fiber.Ctx) error {
 	}
 
 	filter := bson.M{"_id": objectID}
-
 	_, err = collection.DeleteOne(context.Background(), filter)
 	if err != nil {
 		return err
