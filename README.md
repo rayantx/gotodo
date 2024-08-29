@@ -11,6 +11,7 @@ A to-do list using **Go, React, MongoDB, and Chakra UI**.
 
 - [Go](https://go.dev/)
 - [React](https://reactjs.org/)
+- [TypeScript](https://www.typescriptlang.org/)
 - [Chakra UI](https://chakra-ui.com/)
 - [Mongodb](https://www.mongodb.com/)
 - [Bun](https://bun.sh/)
