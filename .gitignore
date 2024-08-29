@@ -11,6 +11,7 @@ node_modules
 _obj
 tmp
 _test
+readme
 vendor/
 
 # logs
